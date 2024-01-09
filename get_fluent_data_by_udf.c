@@ -5,7 +5,7 @@
 
 static ND_Search *domain_table = NULL;
 
-void get_parallel_data(double *Temperature, double *Pressure, double Velocity[], double *Density)
+void get_parallel_data(double xyz[], double *Temperature, double *Pressure, double Velocity[], double *Density)
 {
     double Temperature_parallel = 0.0;
     double Pressure_paralle = 0.0;
@@ -13,7 +13,6 @@ void get_parallel_data(double *Temperature, double *Pressure, double Velocity[],
     double Velocity_v_paralle = 0.0;
     double Velocity_w_paralle = 0.0;
     double Density_paralle = 0.0;
-    //double Temperature = 0.0;
 
 #if !RP_HOST
     cell_t c;
@@ -21,7 +20,7 @@ void get_parallel_data(double *Temperature, double *Pressure, double Velocity[],
     CX_Cell_Id *cx_cell;
     double velocity;
 
-    double P[3] = {60.0, 0.0, 0.0};
+    double P[3] = {xyz[0], xyz[1], xyz[2]};
     double P_Cell[3];
 
     domain_table = CX_Start_ND_Point_Search(domain_table, TRUE, -1);
@@ -68,7 +67,8 @@ DEFINE_ON_DEMAND(get_fluent_data)
     double Pressure = 10.0;
     double Velocity[3] = {0.0, 0.0, 0.0};
     double Density = 10.0;
-    get_parallel_data(&Temperature, &Pressure, Velocity, &Density);
+    double xyz[3] = {60.0, 0.0, 0.0};
+    get_parallel_data(xyz, &Temperature, &Pressure, Velocity, &Density);
 #if RP_HOST
     Message("Temperature = %f\n", Temperature);
     Message("Pressure = %f\n", Pressure);
