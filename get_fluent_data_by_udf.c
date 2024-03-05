@@ -15,7 +15,7 @@ void get_parallel_data(double xyz[], double *Temperature, double *Pressure, doub
     double Density_paralle = 0.0;
 
 #if !RP_HOST
-    cell_t c;
+    cell_t c;   //定义所需要坐标点所在的单元格
     Thread *t;
     CX_Cell_Id *cx_cell;
     double velocity;
@@ -23,14 +23,14 @@ void get_parallel_data(double xyz[], double *Temperature, double *Pressure, doub
     double P[3] = {xyz[0], xyz[1], xyz[2]};
     double P_Cell[3];
 
-    domain_table = CX_Start_ND_Point_Search(domain_table, TRUE, -1);
+    domain_table = CX_Start_ND_Point_Search(domain_table, TRUE, -1);    //开始搜索
 
-    cx_cell = CX_Find_Cell_With_Point(domain_table, P, 0.0);
+    cx_cell = CX_Find_Cell_With_Point(domain_table, P, 0.0);    
 
     if (cx_cell)
     {
-        c = RP_CELL(cx_cell);
-        t = RP_THREAD(cx_cell);
+        c = RP_CELL(cx_cell);   //找到单元序号
+        t = RP_THREAD(cx_cell); //找到单元所在的结构体
         Temperature_parallel = C_T(c, t);
         Pressure_paralle = C_P(c, t);
         Velocity_u_paralle = C_U(c, t);
@@ -39,9 +39,9 @@ void get_parallel_data(double xyz[], double *Temperature, double *Pressure, doub
         Density_paralle = C_R(c, t);
     }
 
-    domain_table = CX_End_ND_Point_Search(domain_table);
+    domain_table = CX_End_ND_Point_Search(domain_table);    //结束搜索
 #if RP_NODE
-    Temperature_parallel = PRF_GRSUM1(Temperature_parallel);
+    Temperature_parallel = PRF_GRSUM1(Temperature_parallel);    //计算所有节点的温度的和
     Pressure_paralle = PRF_GRSUM1(Pressure_paralle);
     Velocity_u_paralle = PRF_GRSUM1(Velocity_u_paralle);
     Velocity_v_paralle = PRF_GRSUM1(Velocity_v_paralle);
@@ -51,7 +51,7 @@ void get_parallel_data(double xyz[], double *Temperature, double *Pressure, doub
 
 #endif
 
-    node_to_host_double_6(Temperature_parallel, Pressure_paralle, Velocity_u_paralle, Velocity_v_paralle, Velocity_w_paralle, Density_paralle);
+    node_to_host_double_6(Temperature_parallel, Pressure_paralle, Velocity_u_paralle, Velocity_v_paralle, Velocity_w_paralle, Density_paralle); //子节点将数据传递给主机
     *Temperature = Temperature_parallel;
     *Pressure = Pressure_paralle;
     Velocity[0] = Velocity_u_paralle;
